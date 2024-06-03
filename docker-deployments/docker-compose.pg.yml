@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-graphql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: graphql-psychologists-courses
+      PGDATA: /var/lib/postgresql/data/
+    volumes:
+      - postgres:/var/lib/postgresql/data:rw
+    networks:
+      - graphql-sandbox
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+
+networks:
+  graphql-sandbox:
+
+volumes:
+  postgres:
