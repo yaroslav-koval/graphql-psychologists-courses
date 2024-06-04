@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS psychologist
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at  TIMESTAMP        DEFAULT (NOW() AT TIME ZONE 'UTC'),
     updated_at  TIMESTAMP        DEFAULT (NOW() AT TIME ZONE 'UTC'),
-    name        VARCHAR(50),
+    name        VARCHAR(50) NOT NULL,
     description VARCHAR(500)
 );
 
@@ -27,10 +27,9 @@ CREATE TABLE IF NOT EXISTS course
     id                  UUID      NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at          TIMESTAMP NOT NULL             DEFAULT (NOW() AT TIME ZONE 'UTC'),
     updated_at          TIMESTAMP NOT NULL             DEFAULT (NOW() AT TIME ZONE 'UTC'),
-    name                VARCHAR(200),
+    name                VARCHAR(200) NOT NULL,
     description         TEXT,
-    content_description VARCHAR(500),
-    price               INT
+    price               INT NOT NULL
 );
 
 CREATE OR REPLACE TRIGGER updated_at_trigger
@@ -63,7 +62,7 @@ CREATE TABLE IF NOT EXISTS lesson
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMP        DEFAULT (NOW() AT TIME ZONE 'UTC'),
     updated_at TIMESTAMP        DEFAULT (NOW() AT TIME ZONE 'UTC'),
-    name       VARCHAR(500),
+    name       VARCHAR(500) NOT NULL,
     number     INT  NOT NULL,
     course     UUID NOT NULL
         constraint fk_c
