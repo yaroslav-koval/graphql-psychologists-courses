@@ -38,13 +38,13 @@ func (m *Migrator) Migrate(workingDir string, migrationLevel int) error {
 }
 
 func (m *Migrator) migrateQueries(workingDir string, migrationLevel int) error {
-	fn := fmt.Sprintf("%s/queries/%v.up.sql", workingDir, migrationLevel)
+	fn := fmt.Sprintf("%s/%v.up.sql", workingDir, migrationLevel)
 
 	return m.migrateFile(fn)
 }
 
 func (m *Migrator) migrateData(workingDir string, migrationLevel int) error {
-	fn := fmt.Sprintf("%s/queries/%v.data.sql", workingDir, migrationLevel)
+	fn := fmt.Sprintf("%s/%v.data.sql", workingDir, migrationLevel)
 
 	if _, err := os.Stat(fn); os.IsNotExist(err) {
 		return nil
