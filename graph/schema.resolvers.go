@@ -11,23 +11,59 @@ import (
 	"github.com/yaroslav-koval/graphql-psychologists-courses/graph/model"
 )
 
-var todos = []*model.Todo{
-	{
-		ID:   "1",
-		Text: "text",
-		Done: false,
-		User: nil,
-	},
+// CreatePsychologist is the resolver for the createPsychologist field.
+func (r *mutationResolver) CreatePsychologist(ctx context.Context, input model.NewPsychologist) (*model.Psychologist, error) {
+	panic(fmt.Errorf("not implemented: CreatePsychologist - createPsychologist"))
 }
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateCourse is the resolver for the createCourse field.
+func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCourse) (*model.Course, error) {
+	panic(fmt.Errorf("not implemented: CreateCourse - createCourse"))
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return todos, nil
+// CreateLesson is the resolver for the createLesson field.
+func (r *mutationResolver) CreateLesson(ctx context.Context, input model.NewLesson) (*model.Lesson, error) {
+	panic(fmt.Errorf("not implemented: CreateLesson - createLesson"))
+}
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
+	panic(fmt.Errorf("not implemented: Login - login"))
+}
+
+// RefreshToken is the resolver for the refreshToken field.
+func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
+	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
+}
+
+// Psychologist is the resolver for the psychologist field.
+func (r *queryResolver) Psychologist(ctx context.Context, id string) (*model.Psychologist, error) {
+	panic(fmt.Errorf("not implemented: Psychologist - psychologist"))
+}
+
+// Psychologists is the resolver for the psychologists field.
+func (r *queryResolver) Psychologists(ctx context.Context) ([]*model.Psychologist, error) {
+	panic(fmt.Errorf("not implemented: Psychologists - psychologists"))
+}
+
+// Course is the resolver for the course field.
+func (r *queryResolver) Course(ctx context.Context, id string) (*model.Course, error) {
+	panic(fmt.Errorf("not implemented: Course - course"))
+}
+
+// Courses is the resolver for the courses field.
+func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
+	panic(fmt.Errorf("not implemented: Courses - courses"))
+}
+
+// Lesson is the resolver for the lesson field.
+func (r *queryResolver) Lesson(ctx context.Context, id string) (*model.Lesson, error) {
+	panic(fmt.Errorf("not implemented: Lesson - lesson"))
+}
+
+// Lessons is the resolver for the lessons field.
+func (r *queryResolver) Lessons(ctx context.Context) ([]*model.Lesson, error) {
+	panic(fmt.Errorf("not implemented: Lessons - lessons"))
 }
 
 // Mutation returns MutationResolver implementation.

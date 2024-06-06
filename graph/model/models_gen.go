@@ -2,25 +2,58 @@
 
 package model
 
+type Course struct {
+	ID            string          `json:"id"`
+	Name          string          `json:"name"`
+	Description   *string         `json:"description,omitempty"`
+	Price         int             `json:"price"`
+	Psychologists []*Psychologist `json:"psychologists"`
+	Lessons       []*Lesson       `json:"lessons"`
+}
+
+type Lesson struct {
+	ID     string  `json:"id"`
+	Name   string  `json:"name"`
+	Number int     `json:"number"`
+	Course *Course `json:"course"`
+}
+
+type Login struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 type Mutation struct {
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type NewCourse struct {
+	Name          string   `json:"name"`
+	Description   *string  `json:"description,omitempty"`
+	Price         int      `json:"price"`
+	Psychologists []string `json:"psychologists"`
+}
+
+type NewLesson struct {
+	Name   string `json:"name"`
+	Number int    `json:"number"`
+	Course string `json:"course"`
+}
+
+type NewPsychologist struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+}
+
+type Psychologist struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description,omitempty"`
+	Courses     []*Course `json:"Courses,omitempty"`
 }
 
 type Query struct {
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type RefreshTokenInput struct {
+	Token string `json:"token"`
 }
