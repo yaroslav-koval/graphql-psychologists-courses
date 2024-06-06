@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/db"
@@ -27,6 +28,8 @@ func main() {
 		logging.Send(logging.Error().Err(errors.New("migrations directory is not specified")))
 		return
 	}
+
+	logging.Send(logging.Info().Str("message", fmt.Sprintf("Directory for migrations:: %s", dir)))
 
 	err = m.Migrate(dir, 1)
 	if err != nil {

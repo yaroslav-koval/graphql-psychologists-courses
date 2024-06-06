@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS courses_psychologists
             references course,
     psychologist UUID NOT NULL
         constraint fk_p
-            references psychologist
+            references psychologist,
+    unique (course, psychologist)
 );
 
 CREATE OR REPLACE TRIGGER updated_at_trigger

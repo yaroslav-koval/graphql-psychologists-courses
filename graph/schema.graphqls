@@ -10,7 +10,7 @@ type Course {
   name: String!
   description: String
   price: Int!
-  psychologist: Psychologist!
+  psychologists: [Psychologist!]!
   lessons: [Lesson!]!
 }
 
@@ -39,7 +39,7 @@ input NewCourse {
   name: String!
   description: String
   price: Int!
-  psychologist: ID!
+  psychologists: [ID!]!
 }
 
 input NewLesson {

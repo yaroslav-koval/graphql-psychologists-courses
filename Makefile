@@ -1,5 +1,3 @@
 migrate:
-	export GRAPHQL_PSYCHOLOGISTS_COURSES_MIGRATIONS_DIRECTORY="$$(pwd)/migrations" && \
-	env | grep GRAPHQL_PSYCHOLOGISTS_COURSES_MIGRATIONS_DIRECTORY && \
+	GRAPHQL_PSYCHOLOGISTS_COURSES_MIGRATIONS_DIRECTORY="$$(pwd)/migrations" \
 	go run migrations/main.go
-
