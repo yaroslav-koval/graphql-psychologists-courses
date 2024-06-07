@@ -48,19 +48,8 @@ input NewLesson {
   course: ID!
 }
 
-input Login {
-  username: String!
-  password: String!
-}
-
-input RefreshTokenInput{
-  token: String!
-}
-
 type Mutation {
   createPsychologist(input: NewPsychologist!): Psychologist!
   createCourse(input: NewCourse!): Course!
   createLesson(input: NewLesson!): Lesson!
-  login(input: Login!): String!
-  refreshToken(input: RefreshTokenInput!): String!
 }

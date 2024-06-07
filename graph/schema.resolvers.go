@@ -26,16 +26,6 @@ func (r *mutationResolver) CreateLesson(ctx context.Context, input model.NewLess
 	panic(fmt.Errorf("not implemented: CreateLesson - createLesson"))
 }
 
-// Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input model.Login) (string, error) {
-	panic(fmt.Errorf("not implemented: Login - login"))
-}
-
-// RefreshToken is the resolver for the refreshToken field.
-func (r *mutationResolver) RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error) {
-	panic(fmt.Errorf("not implemented: RefreshToken - refreshToken"))
-}
-
 // Psychologist is the resolver for the psychologist field.
 func (r *queryResolver) Psychologist(ctx context.Context, id string) (*model.Psychologist, error) {
 	panic(fmt.Errorf("not implemented: Psychologist - psychologist"))

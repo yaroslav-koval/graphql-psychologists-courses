@@ -18,11 +18,6 @@ type Lesson struct {
 	Course *Course `json:"course"`
 }
 
-type Login struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 type Mutation struct {
 }
 
@@ -52,8 +47,4 @@ type Psychologist struct {
 }
 
 type Query struct {
-}
-
-type RefreshTokenInput struct {
-	Token string `json:"token"`
 }
