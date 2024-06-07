@@ -6,6 +6,7 @@ services:
     container_name: postgres-graphql
     ports:
       - "5432:5432"
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: secret

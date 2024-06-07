@@ -2,7 +2,7 @@ type Psychologist {
   id: ID!
   name: String!
   description: String
-  Courses: [Course]
+  courses: [Course]
 }
 
 type Course {

@@ -1,18 +1,18 @@
 package main
 
 import (
-	"context"
-	"github.com/yaroslav-koval/graphql-psychologists-courses/entman"
-	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/db"
-	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/db/pgxpool"
-	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/logging"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/yaroslav-koval/graphql-psychologists-courses/bunmodels"
+	"github.com/yaroslav-koval/graphql-psychologists-courses/entman"
 	"github.com/yaroslav-koval/graphql-psychologists-courses/graph"
+	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/db"
+	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/db/bun"
+	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/logging"
 )
 
 const defaultPort = "8080"
@@ -23,19 +23,28 @@ func main() {
 		port = defaultPort
 	}
 
-	ctx := context.Background()
-
 	connString := os.Getenv("GRAPHQL_SERVER_CONNECTION_STRING")
 	if connString == "" {
-		connString = db.ParsePGConnString("postgres", "secret", "localhost", 5432, "graphql-psychologists-courses")
+		connString = db.ParsePGConnString(
+			"postgres",
+			"secret",
+			"localhost",
+			5432,
+			"graphql-psychologists-courses",
+		)
 	}
 
-	pool, err := pgxpool.CreatePool(ctx, connString)
+	logging.Send(logging.Info().Str("connectionString", connString))
+
+	b, err := bun.CreateConnection(connString)
 	if err != nil {
 		logging.Send(logging.Error().Err(err))
+		return
 	}
 
-	em := entman.New(pool)
+	b.RegisterModel((*bunmodels.CoursePsychologist)(nil))
+
+	em := entman.New(b)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: graph.NewResolver(em)}))
 

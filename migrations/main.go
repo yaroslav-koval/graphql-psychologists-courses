@@ -17,7 +17,13 @@ func main() {
 
 	connString := os.Getenv("GRAPHQL_PG_MIGRATIONS_CONNECTION_STRING")
 	if connString == "" {
-		connString = db.ParsePGConnString("postgres", "secret", "localhost", 5432, "graphql-psychologists-courses")
+		connString = db.ParsePGConnString(
+			"postgres",
+			"secret",
+			"localhost",
+			5432,
+			"graphql-psychologists-courses",
+		)
 	}
 
 	pool, err := pgxpool.CreatePool(ctx, connString)

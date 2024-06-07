@@ -20,8 +20,6 @@ func New(pg *pgxpool.Pool) *Migrator {
 }
 
 func (m *Migrator) Migrate(workingDir string, migrationLevel int) error {
-	workingDir = fmt.Sprintf("%s/migration", workingDir)
-
 	for i := 1; i <= migrationLevel; i++ {
 		err := m.migrateQueries(workingDir, i)
 		if err != nil {

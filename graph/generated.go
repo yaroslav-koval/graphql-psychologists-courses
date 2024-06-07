@@ -225,7 +225,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePsychologist(childComplexity, args["input"].(model.NewPsychologist)), true
 
-	case "Psychologist.Courses":
+	case "Psychologist.courses":
 		if e.complexity.Psychologist.Courses == nil {
 			break
 		}
@@ -798,8 +798,8 @@ func (ec *executionContext) fieldContext_Course_psychologists(_ context.Context,
 				return ec.fieldContext_Psychologist_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Psychologist_description(ctx, field)
-			case "Courses":
-				return ec.fieldContext_Psychologist_Courses(ctx, field)
+			case "courses":
+				return ec.fieldContext_Psychologist_courses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Psychologist", field.Name)
 		},
@@ -1096,8 +1096,8 @@ func (ec *executionContext) fieldContext_Mutation_createPsychologist(ctx context
 				return ec.fieldContext_Psychologist_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Psychologist_description(ctx, field)
-			case "Courses":
-				return ec.fieldContext_Psychologist_Courses(ctx, field)
+			case "courses":
+				return ec.fieldContext_Psychologist_courses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Psychologist", field.Name)
 		},
@@ -1379,8 +1379,8 @@ func (ec *executionContext) fieldContext_Psychologist_description(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Psychologist_Courses(ctx context.Context, field graphql.CollectedField, obj *model.Psychologist) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Psychologist_Courses(ctx, field)
+func (ec *executionContext) _Psychologist_courses(ctx context.Context, field graphql.CollectedField, obj *model.Psychologist) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Psychologist_courses(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1407,7 +1407,7 @@ func (ec *executionContext) _Psychologist_Courses(ctx context.Context, field gra
 	return ec.marshalOCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Psychologist_Courses(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Psychologist_courses(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Psychologist",
 		Field:      field,
@@ -1479,8 +1479,8 @@ func (ec *executionContext) fieldContext_Query_psychologist(ctx context.Context,
 				return ec.fieldContext_Psychologist_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Psychologist_description(ctx, field)
-			case "Courses":
-				return ec.fieldContext_Psychologist_Courses(ctx, field)
+			case "courses":
+				return ec.fieldContext_Psychologist_courses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Psychologist", field.Name)
 		},
@@ -1544,8 +1544,8 @@ func (ec *executionContext) fieldContext_Query_psychologists(_ context.Context, 
 				return ec.fieldContext_Psychologist_name(ctx, field)
 			case "description":
 				return ec.fieldContext_Psychologist_description(ctx, field)
-			case "Courses":
-				return ec.fieldContext_Psychologist_Courses(ctx, field)
+			case "courses":
+				return ec.fieldContext_Psychologist_courses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Psychologist", field.Name)
 		},
@@ -4033,8 +4033,8 @@ func (ec *executionContext) _Psychologist(ctx context.Context, sel ast.Selection
 			}
 		case "description":
 			out.Values[i] = ec._Psychologist_description(ctx, field, obj)
-		case "Courses":
-			out.Values[i] = ec._Psychologist_Courses(ctx, field, obj)
+		case "courses":
+			out.Values[i] = ec._Psychologist_courses(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

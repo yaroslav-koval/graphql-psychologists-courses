@@ -1,13 +1,15 @@
 package entman
 
-import "github.com/jackc/pgx/v5/pgxpool"
+import (
+	"github.com/uptrace/bun"
+)
 
 type EntityManager struct {
-	pg *pgxpool.Pool
+	db *bun.DB
 }
 
-func New(pg *pgxpool.Pool) *EntityManager {
+func New(pg *bun.DB) *EntityManager {
 	return &EntityManager{
-		pg: pg,
+		db: pg,
 	}
 }

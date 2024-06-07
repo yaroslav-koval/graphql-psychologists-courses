@@ -43,7 +43,7 @@ type Psychologist struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Description *string   `json:"description,omitempty"`
-	Courses     []*Course `json:"Courses,omitempty"`
+	Courses     []*Course `json:"courses,omitempty"`
 }
 
 type Query struct {

@@ -28,32 +28,32 @@ func (r *mutationResolver) CreateLesson(ctx context.Context, input model.NewLess
 
 // Psychologist is the resolver for the psychologist field.
 func (r *queryResolver) Psychologist(ctx context.Context, id string) (*model.Psychologist, error) {
-	panic(fmt.Errorf("not implemented: Psychologist - psychologist"))
+	return r.em.GetPsychologistByID(ctx, id)
 }
 
 // Psychologists is the resolver for the psychologists field.
 func (r *queryResolver) Psychologists(ctx context.Context) ([]*model.Psychologist, error) {
-	panic(fmt.Errorf("not implemented: Psychologists - psychologists"))
+	return r.em.GetAllPsychologists(ctx)
 }
 
 // Course is the resolver for the course field.
 func (r *queryResolver) Course(ctx context.Context, id string) (*model.Course, error) {
-	panic(fmt.Errorf("not implemented: Course - course"))
+	return r.em.GetCourseByID(ctx, id)
 }
 
 // Courses is the resolver for the courses field.
 func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
-	panic(fmt.Errorf("not implemented: Courses - courses"))
+	return r.em.GetAllCourses(ctx)
 }
 
 // Lesson is the resolver for the lesson field.
 func (r *queryResolver) Lesson(ctx context.Context, id string) (*model.Lesson, error) {
-	panic(fmt.Errorf("not implemented: Lesson - lesson"))
+	return r.em.GetLessonByID(ctx, id)
 }
 
 // Lessons is the resolver for the lessons field.
 func (r *queryResolver) Lessons(ctx context.Context) ([]*model.Lesson, error) {
-	panic(fmt.Errorf("not implemented: Lessons - lessons"))
+	return r.em.GetAllLessons(ctx)
 }
 
 // Mutation returns MutationResolver implementation.
