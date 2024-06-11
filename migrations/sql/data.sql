@@ -8,13 +8,13 @@ set name = excluded.name,
     description = excluded.description;
 
 insert into course (id, name, description, price)
-values ('71d53f3c-b904-4cac-b3c5-ceb994d882e9', '5 simple steps to achieve financial independence', 'This course will help you to become more efficient in financial planning', 5400),--1
-       ('a14c6a54-7adf-4eff-842e-93891b72b20f', 'Aspects of poor people', 'With this course you will understand how are different viewpoints of poor and rich people', 9800),--1
-       ('34906cbf-9e19-41c1-bb95-8108cb3501f7', 'You are not alone', 'This material teaches customers to achieve money goals involving nearby people', 1400),--1,2
-       ('c1162fb5-504a-406e-9886-75649cd97e12', 'Internal politic', 'With such knowledge you can became a master of influence', 4300),--2
-       ('eb9fa6ec-e9e4-4105-96c5-f740378a3885', 'How to become a snail, or... dragon', 'This course lets you to open mind and become whatever you want', 3400),--3
-       ('b5d198c5-1d71-40a3-b4e5-520dc1cc25c7', 'Understanding yourself', 'Have you already understood yourself? Nah, it''s impossible, but how far can you go?', 4600),--3,4
-       ('6b5de104-337b-44cb-acec-dd8e0ca800c6', 'Accepting reality', 'This masterpiece will immerse you into new old world', 2600)--4
+values ('71d53f3c-b904-4cac-b3c5-ceb994d882e9', '5 simple steps to achieve financial independence', 'This course will help you to become more efficient in financial planning', 5400),--Adam Smith
+       ('a14c6a54-7adf-4eff-842e-93891b72b20f', 'Aspects of poor people', 'With this course you will understand how are different viewpoints of poor and rich people', 9800),--Adam Smith
+       ('34906cbf-9e19-41c1-bb95-8108cb3501f7', 'You are not alone', 'This material teaches customers to achieve money goals involving nearby people', 1400),--Adam Smith,Thomas Hobbes
+       ('c1162fb5-504a-406e-9886-75649cd97e12', 'Internal politic', 'With such knowledge you can became a master of influence', 4300),--Thomas Hobbes
+       ('eb9fa6ec-e9e4-4105-96c5-f740378a3885', 'How to become a snail, or... dragon', 'This course lets you to open mind and become whatever you want', 3400),--Michel de Montaigne
+       ('b5d198c5-1d71-40a3-b4e5-520dc1cc25c7', 'Understanding yourself', 'Have you already understood yourself? Nah, it''s impossible, but how far can you go?', 4600),--Michel de Montaigne,Albert Camus
+       ('6b5de104-337b-44cb-acec-dd8e0ca800c6', 'Accepting reality', 'This masterpiece will immerse you into new old world', 2600)--Albert Camus
 on conflict (id) do update
 set name = excluded.name,
     description = excluded.description,
