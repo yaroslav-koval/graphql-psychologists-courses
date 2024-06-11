@@ -1,12 +1,18 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/rs/zerolog"
 	"github.com/yaroslav-koval/graphql-psychologists-courses/bunmodels"
 	"github.com/yaroslav-koval/graphql-psychologists-courses/entman"
 	"github.com/yaroslav-koval/graphql-psychologists-courses/graph"
@@ -36,13 +42,17 @@ func main() {
 
 	logging.Send(logging.Info().Str("connectionString", connString))
 
-	b, err := bun.CreateConnection(connString)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.DateTime})
+	logging.SetLogger(logger)
+
+	b, err := bun.CreateConnection(connString, &logger)
 	if err != nil {
 		logging.Send(logging.Error().Err(err))
 		return
 	}
 
-	b.RegisterModel((*bunmodels.CoursePsychologist)(nil))
+	bunmodels.RegisterBunManyToManyModels(b)
 
 	em := entman.New(b)
 
@@ -52,5 +62,27 @@ func main() {
 	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+
+	serverErrorCh := make(chan error)
+	go func() {
+		serverErrorCh <- http.ListenAndServe(":"+port, nil)
+	}()
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh,
+		syscall.SIGTERM,
+		syscall.SIGINT,
+		syscall.SIGHUP,
+		syscall.SIGQUIT)
+
+	select {
+	case err = <-serverErrorCh:
+		logging.SendSimpleErrorAsync(err)
+	case s := <-sigCh:
+		logging.Send(
+			logging.Info().Str("message", fmt.Sprintf("Got signar from os: %s", s)),
+		)
+	}
+
+	logging.WaitAsyncLogs(context.Background(), time.Second*30)
 }

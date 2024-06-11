@@ -1,9 +1,11 @@
 package logging
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog"
 )
@@ -19,8 +21,22 @@ var q = logQueue{
 	events: []*zerolog.Event{},
 }
 
-func WaitAsyncLogs() {
-	q.wg.Wait()
+func WaitAsyncLogs(ctx context.Context, timeout time.Duration) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	waitForErrorsCh := make(chan int)
+	go func() {
+		q.wg.Wait()
+		close(waitForErrorsCh)
+	}()
+
+	select {
+	case <-ctx.Done():
+		return
+	case <-waitForErrorsCh:
+		return
+	}
 }
 
 func (q *logQueue) add(e *zerolog.Event) {

@@ -2,22 +2,6 @@
 
 package model
 
-type Course struct {
-	ID            string          `json:"id"`
-	Name          string          `json:"name"`
-	Description   *string         `json:"description,omitempty"`
-	Price         int             `json:"price"`
-	Psychologists []*Psychologist `json:"psychologists"`
-	Lessons       []*Lesson       `json:"lessons"`
-}
-
-type Lesson struct {
-	ID     string  `json:"id"`
-	Name   string  `json:"name"`
-	Number int     `json:"number"`
-	Course *Course `json:"course"`
-}
-
 type Mutation struct {
 }
 
@@ -39,12 +23,24 @@ type NewPsychologist struct {
 	Description *string `json:"description,omitempty"`
 }
 
-type Psychologist struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Description *string   `json:"description,omitempty"`
-	Courses     []*Course `json:"courses,omitempty"`
+type Query struct {
 }
 
-type Query struct {
+type UpdateCourse struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
+	Price       int     `json:"price"`
+}
+
+type UpdateLesson struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Number int    `json:"number"`
+}
+
+type UpdatePsychologist struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Description *string `json:"description,omitempty"`
 }

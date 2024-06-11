@@ -2,96 +2,154 @@ package entman
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"github.com/yaroslav-koval/graphql-psychologists-courses/bunmodels"
-	"github.com/yaroslav-koval/graphql-psychologists-courses/graph/model"
 	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/logging"
 )
 
-func (em *EntityManager) GetPsychologistByID(ctx context.Context, id string) (*model.Psychologist, error) {
-	panic(fmt.Errorf("not implemented: Psychologist - psychologist"))
+func (em *EntityManager) GetPsychologistByID(ctx context.Context, id string) (*bunmodels.Psychologist, error) {
+	p := &bunmodels.Psychologist{
+		ID: id,
+	}
+
+	err := em.db.NewSelect().
+		Model(p).
+		WherePK().
+		Scan(ctx)
+	if err != nil {
+		logging.SendSimpleErrorAsync(err)
+		return nil, err
+	}
+
+	return p, nil
 }
 
-func (em *EntityManager) GetAllPsychologists(ctx context.Context) ([]*model.Psychologist, error) {
-	panic(fmt.Errorf("not implemented: Psychologists - psychologists"))
+func (em *EntityManager) GetAllPsychologists(ctx context.Context) ([]*bunmodels.Psychologist, error) {
+	ps := []*bunmodels.Psychologist{}
+
+	err := em.db.NewSelect().
+		Model(&ps).
+		Scan(ctx)
+	if err != nil {
+		logging.SendSimpleErrorAsync(err)
+		return nil, err
+	}
+
+	return ps, nil
 }
 
-func (em *EntityManager) GetCourseByID(ctx context.Context, id string) (*model.Course, error) {
-	panic("1")
+func (em *EntityManager) GetCourseByID(ctx context.Context, id string) (*bunmodels.Course, error) {
+	c := &bunmodels.Course{
+		ID: id,
+	}
+
+	err := em.db.NewSelect().
+		Model(c).
+		WherePK().
+		Scan(ctx)
+	if err != nil {
+		logging.SendSimpleErrorAsync(err)
+		return nil, err
+	}
+
+	return c, nil
 }
 
-func (em *EntityManager) GetAllCourses(ctx context.Context) ([]*model.Course, error) {
-	panic("1")
+func (em *EntityManager) GetAllCourses(ctx context.Context) ([]*bunmodels.Course, error) {
+	cs := []*bunmodels.Course{}
+
+	err := em.db.NewSelect().
+		Model(&cs).
+		Scan(ctx)
+	if err != nil {
+		logging.SendSimpleErrorAsync(err)
+		return nil, err
+	}
+
+	return cs, nil
 }
 
-func (em *EntityManager) GetLessonByID(ctx context.Context, id string) (*model.Lesson, error) {
-	l := &bunmodels.Lesson{}
+func (em *EntityManager) GetLessonByID(ctx context.Context, id string) (*bunmodels.Lesson, error) {
+	l := &bunmodels.Lesson{
+		ID: id,
+	}
 
 	err := em.db.NewSelect().
 		Model(l).
-		Where("l.id = ?", id).
-		Relation("Course").
-		Relation("Course.Lessons").
-		Relation("Course.Psychologists").
+		WherePK().
 		Scan(ctx)
 	if err != nil {
-		logging.SendAsync(logging.Error().Str("error", err.Error()))
+		logging.SendSimpleErrorAsync(err)
 		return nil, err
 	}
 
-	res := &model.Lesson{}
-	err = parseBunModelToGenerated(l, res)
-	if err != nil {
-		logging.SendAsync(logging.Error().Str("error", err.Error()))
-		return nil, err
-	}
-
-	return res, nil
+	return l, nil
 }
 
-func (em *EntityManager) GetAllLessons(ctx context.Context) ([]*model.Lesson, error) {
-	l := []*bunmodels.Lesson{}
+func (em *EntityManager) GetAllLessons(ctx context.Context) ([]*bunmodels.Lesson, error) {
+	ls := []*bunmodels.Lesson{}
 
 	err := em.db.NewSelect().
-		Model(&l).
-		Relation("Course").
-		Relation("Course.Lessons").
-		Relation("Course.Psychologists").
+		Model(&ls).
 		Scan(ctx)
 	if err != nil {
-		logging.SendAsync(logging.Error().Str("error", err.Error()))
+		logging.SendSimpleErrorAsync(err)
 		return nil, err
 	}
 
-	res := []*model.Lesson{}
-	for _, item := range l {
-		r := &model.Lesson{}
-		err = parseBunModelToGenerated(item, r)
-		if err != nil {
-			logging.SendAsync(logging.Error().Str("error", err.Error()))
-			return nil, err
-		}
-
-		res = append(res, r)
-	}
-
-	return res, nil
+	return ls, nil
 }
 
-func parseBunModelToGenerated(source, destination any) error {
-	m, err := json.Marshal(source)
-	if err != nil {
-		logging.SendAsync(logging.Error().Str("error", err.Error()))
-		return err
+func (em *EntityManager) GetPsychologistCourses(ctx context.Context, psychologistID string) ([]*bunmodels.Course, error) {
+	p := &bunmodels.Psychologist{
+		ID: psychologistID,
 	}
 
-	err = json.Unmarshal(m, &destination)
+	err := em.db.NewSelect().
+		Model(p).
+		WherePK().
+		Relation("Courses").
+		Scan(ctx)
 	if err != nil {
-		logging.SendAsync(logging.Error().Str("error", err.Error()))
-		return err
+		logging.SendSimpleErrorAsync(err)
+		return nil, err
 	}
 
-	return nil
+	return p.Courses, nil
+}
+
+func (em *EntityManager) GetCourseLessons(ctx context.Context, courseID string) ([]*bunmodels.Lesson, error) {
+	c := &bunmodels.Course{
+		ID: courseID,
+	}
+
+	err := em.db.NewSelect().
+		Model(c).
+		WherePK().
+		Relation("Lessons").
+		Scan(ctx)
+	if err != nil {
+		logging.SendSimpleErrorAsync(err)
+		return nil, err
+	}
+
+	return c.Lessons, nil
+}
+
+func (em *EntityManager) GetCoursePsychologists(ctx context.Context, courseID string) ([]*bunmodels.Psychologist, error) {
+	c := &bunmodels.Course{
+		ID: courseID,
+	}
+
+	err := em.db.NewSelect().
+		Model(c).
+		WherePK().
+		Relation("Psychologists").
+		Scan(ctx)
+	if err != nil {
+		logging.SendSimpleErrorAsync(err)
+		return nil, err
+	}
+
+	return c.Psychologists, nil
 }

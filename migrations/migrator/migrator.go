@@ -13,20 +13,29 @@ type Migrator struct {
 	pg *pgxpool.Pool
 }
 
-func New(pg *pgxpool.Pool) *Migrator {
+func NewMigrator(pg *pgxpool.Pool) *Migrator {
 	return &Migrator{
 		pg: pg,
 	}
 }
 
-func (m *Migrator) Migrate(workingDir string, migrationLevel int) error {
-	for i := 1; i <= migrationLevel; i++ {
-		err := m.migrateQueries(workingDir, i)
+func (m *Migrator) Migrate(workingDir string, md Mode) error {
+	workingDir = fmt.Sprintf("%s/sql", workingDir)
+
+	if md == UP {
+		err := m.migrateTables(workingDir)
 		if err != nil {
 			return err
 		}
 
-		err = m.migrateData(workingDir, i)
+		err = m.migrateData(workingDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	if md == DOWN {
+		err := m.migrateDown(workingDir)
 		if err != nil {
 			return err
 		}
@@ -35,14 +44,24 @@ func (m *Migrator) Migrate(workingDir string, migrationLevel int) error {
 	return nil
 }
 
-func (m *Migrator) migrateQueries(workingDir string, migrationLevel int) error {
-	fn := fmt.Sprintf("%s/%v.up.sql", workingDir, migrationLevel)
+func (m *Migrator) migrateTables(workingDir string) error {
+	fn := fmt.Sprintf("%s/up.sql", workingDir)
 
 	return m.migrateFile(fn)
 }
 
-func (m *Migrator) migrateData(workingDir string, migrationLevel int) error {
-	fn := fmt.Sprintf("%s/%v.data.sql", workingDir, migrationLevel)
+func (m *Migrator) migrateData(workingDir string) error {
+	fn := fmt.Sprintf("%s/data.sql", workingDir)
+
+	if _, err := os.Stat(fn); os.IsNotExist(err) {
+		return nil
+	}
+
+	return m.migrateFile(fn)
+}
+
+func (m *Migrator) migrateDown(workingDir string) error {
+	fn := fmt.Sprintf("%s/down.sql", workingDir)
 
 	if _, err := os.Stat(fn); os.IsNotExist(err) {
 		return nil

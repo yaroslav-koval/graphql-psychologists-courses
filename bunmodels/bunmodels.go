@@ -4,6 +4,10 @@ import (
 	"github.com/uptrace/bun"
 )
 
+func RegisterBunManyToManyModels(b *bun.DB) {
+	b.RegisterModel((*CoursePsychologist)(nil))
+}
+
 type Psychologist struct {
 	bun.BaseModel `bun:"table:psychologist,alias:p"`
 

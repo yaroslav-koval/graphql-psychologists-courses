@@ -24,7 +24,7 @@ resolver:
   package: graph
   filename_template: "{name}.resolvers.go"
   # Optional: turn on to not generate template comments above resolvers
-  # omit_template_comment: false
+  omit_template_comment: true
 
 # Optional: turn on use ` + "`" + `gqlgen:"fieldName"` + "`" + ` tags in your models
 # struct_tag: json
@@ -66,7 +66,7 @@ resolver:
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-#  - "github.com/yaroslav-koval/graphql-psychologists-courses/graph/model"
+  - "github.com/yaroslav-koval/graphql-psychologists-courses/bunmodels"
 
 # This section declares type mapping between the GraphQL and go type systems
 #

@@ -16,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/yaroslav-koval/graphql-psychologists-courses/bunmodels"
 	"github.com/yaroslav-koval/graphql-psychologists-courses/graph/model"
 )
 
@@ -39,7 +40,10 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Course() CourseResolver
+	Lesson() LessonResolver
 	Mutation() MutationResolver
+	Psychologist() PsychologistResolver
 	Query() QueryResolver
 }
 
@@ -67,6 +71,9 @@ type ComplexityRoot struct {
 		CreateCourse       func(childComplexity int, input model.NewCourse) int
 		CreateLesson       func(childComplexity int, input model.NewLesson) int
 		CreatePsychologist func(childComplexity int, input model.NewPsychologist) int
+		UpdateCourse       func(childComplexity int, input model.UpdateCourse) int
+		UpdateLesson       func(childComplexity int, input model.UpdateLesson) int
+		UpdatePsychologist func(childComplexity int, input model.UpdatePsychologist) int
 	}
 
 	Psychologist struct {
@@ -86,18 +93,31 @@ type ComplexityRoot struct {
 	}
 }
 
+type CourseResolver interface {
+	Psychologists(ctx context.Context, obj *bunmodels.Course) ([]*bunmodels.Psychologist, error)
+	Lessons(ctx context.Context, obj *bunmodels.Course) ([]*bunmodels.Lesson, error)
+}
+type LessonResolver interface {
+	Course(ctx context.Context, obj *bunmodels.Lesson) (*bunmodels.Course, error)
+}
 type MutationResolver interface {
-	CreatePsychologist(ctx context.Context, input model.NewPsychologist) (*model.Psychologist, error)
-	CreateCourse(ctx context.Context, input model.NewCourse) (*model.Course, error)
-	CreateLesson(ctx context.Context, input model.NewLesson) (*model.Lesson, error)
+	CreatePsychologist(ctx context.Context, input model.NewPsychologist) (*bunmodels.Psychologist, error)
+	UpdatePsychologist(ctx context.Context, input model.UpdatePsychologist) (*bunmodels.Psychologist, error)
+	CreateCourse(ctx context.Context, input model.NewCourse) (*bunmodels.Course, error)
+	UpdateCourse(ctx context.Context, input model.UpdateCourse) (*bunmodels.Course, error)
+	CreateLesson(ctx context.Context, input model.NewLesson) (*bunmodels.Lesson, error)
+	UpdateLesson(ctx context.Context, input model.UpdateLesson) (*bunmodels.Lesson, error)
+}
+type PsychologistResolver interface {
+	Courses(ctx context.Context, obj *bunmodels.Psychologist) ([]*bunmodels.Course, error)
 }
 type QueryResolver interface {
-	Psychologist(ctx context.Context, id string) (*model.Psychologist, error)
-	Psychologists(ctx context.Context) ([]*model.Psychologist, error)
-	Course(ctx context.Context, id string) (*model.Course, error)
-	Courses(ctx context.Context) ([]*model.Course, error)
-	Lesson(ctx context.Context, id string) (*model.Lesson, error)
-	Lessons(ctx context.Context) ([]*model.Lesson, error)
+	Psychologist(ctx context.Context, id string) (*bunmodels.Psychologist, error)
+	Psychologists(ctx context.Context) ([]*bunmodels.Psychologist, error)
+	Course(ctx context.Context, id string) (*bunmodels.Course, error)
+	Courses(ctx context.Context) ([]*bunmodels.Course, error)
+	Lesson(ctx context.Context, id string) (*bunmodels.Lesson, error)
+	Lessons(ctx context.Context) ([]*bunmodels.Lesson, error)
 }
 
 type executableSchema struct {
@@ -225,6 +245,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePsychologist(childComplexity, args["input"].(model.NewPsychologist)), true
 
+	case "Mutation.updateCourse":
+		if e.complexity.Mutation.UpdateCourse == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCourse_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCourse(childComplexity, args["input"].(model.UpdateCourse)), true
+
+	case "Mutation.updateLesson":
+		if e.complexity.Mutation.UpdateLesson == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateLesson_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateLesson(childComplexity, args["input"].(model.UpdateLesson)), true
+
+	case "Mutation.updatePsychologist":
+		if e.complexity.Mutation.UpdatePsychologist == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePsychologist_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePsychologist(childComplexity, args["input"].(model.UpdatePsychologist)), true
+
 	case "Psychologist.courses":
 		if e.complexity.Psychologist.Courses == nil {
 			break
@@ -321,6 +377,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewCourse,
 		ec.unmarshalInputNewLesson,
 		ec.unmarshalInputNewPsychologist,
+		ec.unmarshalInputUpdateCourse,
+		ec.unmarshalInputUpdateLesson,
+		ec.unmarshalInputUpdatePsychologist,
 	)
 	first := true
 
@@ -482,6 +541,51 @@ func (ec *executionContext) field_Mutation_createPsychologist_args(ctx context.C
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateCourse_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateCourse
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateCourse2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐUpdateCourse(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateLesson_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdateLesson
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateLesson2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐUpdateLesson(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePsychologist_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.UpdatePsychologist
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdatePsychologist2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐUpdatePsychologist(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -580,7 +684,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Course_id(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+func (ec *executionContext) _Course_id(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Course) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Course_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -624,7 +728,7 @@ func (ec *executionContext) fieldContext_Course_id(_ context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _Course_name(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+func (ec *executionContext) _Course_name(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Course) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Course_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -668,7 +772,7 @@ func (ec *executionContext) fieldContext_Course_name(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Course_description(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+func (ec *executionContext) _Course_description(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Course) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Course_description(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -709,7 +813,7 @@ func (ec *executionContext) fieldContext_Course_description(_ context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Course_price(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+func (ec *executionContext) _Course_price(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Course) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Course_price(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -753,7 +857,7 @@ func (ec *executionContext) fieldContext_Course_price(_ context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Course_psychologists(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+func (ec *executionContext) _Course_psychologists(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Course) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Course_psychologists(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -767,7 +871,7 @@ func (ec *executionContext) _Course_psychologists(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Psychologists, nil
+		return ec.resolvers.Course().Psychologists(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -779,17 +883,17 @@ func (ec *executionContext) _Course_psychologists(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Psychologist)
+	res := resTmp.([]*bunmodels.Psychologist)
 	fc.Result = res
-	return ec.marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologistᚄ(ctx, field.Selections, res)
+	return ec.marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologistᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Course_psychologists(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Course",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -807,7 +911,7 @@ func (ec *executionContext) fieldContext_Course_psychologists(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Course_lessons(ctx context.Context, field graphql.CollectedField, obj *model.Course) (ret graphql.Marshaler) {
+func (ec *executionContext) _Course_lessons(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Course) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Course_lessons(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -821,7 +925,7 @@ func (ec *executionContext) _Course_lessons(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Lessons, nil
+		return ec.resolvers.Course().Lessons(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -833,17 +937,17 @@ func (ec *executionContext) _Course_lessons(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Lesson)
+	res := resTmp.([]*bunmodels.Lesson)
 	fc.Result = res
-	return ec.marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLessonᚄ(ctx, field.Selections, res)
+	return ec.marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLessonᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Course_lessons(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Course",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -861,7 +965,7 @@ func (ec *executionContext) fieldContext_Course_lessons(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Lesson_id(ctx context.Context, field graphql.CollectedField, obj *model.Lesson) (ret graphql.Marshaler) {
+func (ec *executionContext) _Lesson_id(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Lesson) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Lesson_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -905,7 +1009,7 @@ func (ec *executionContext) fieldContext_Lesson_id(_ context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _Lesson_name(ctx context.Context, field graphql.CollectedField, obj *model.Lesson) (ret graphql.Marshaler) {
+func (ec *executionContext) _Lesson_name(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Lesson) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Lesson_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -949,7 +1053,7 @@ func (ec *executionContext) fieldContext_Lesson_name(_ context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Lesson_number(ctx context.Context, field graphql.CollectedField, obj *model.Lesson) (ret graphql.Marshaler) {
+func (ec *executionContext) _Lesson_number(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Lesson) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Lesson_number(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -993,7 +1097,7 @@ func (ec *executionContext) fieldContext_Lesson_number(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Lesson_course(ctx context.Context, field graphql.CollectedField, obj *model.Lesson) (ret graphql.Marshaler) {
+func (ec *executionContext) _Lesson_course(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Lesson) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Lesson_course(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1007,7 +1111,7 @@ func (ec *executionContext) _Lesson_course(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Course, nil
+		return ec.resolvers.Lesson().Course(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1019,17 +1123,17 @@ func (ec *executionContext) _Lesson_course(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Course)
+	res := resTmp.(*bunmodels.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Lesson_course(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Lesson",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1077,9 +1181,9 @@ func (ec *executionContext) _Mutation_createPsychologist(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Psychologist)
+	res := resTmp.(*bunmodels.Psychologist)
 	fc.Result = res
-	return ec.marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologist(ctx, field.Selections, res)
+	return ec.marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologist(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createPsychologist(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1116,6 +1220,71 @@ func (ec *executionContext) fieldContext_Mutation_createPsychologist(ctx context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updatePsychologist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updatePsychologist(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePsychologist(rctx, fc.Args["input"].(model.UpdatePsychologist))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*bunmodels.Psychologist)
+	fc.Result = res
+	return ec.marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologist(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updatePsychologist(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Psychologist_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Psychologist_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Psychologist_description(ctx, field)
+			case "courses":
+				return ec.fieldContext_Psychologist_courses(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Psychologist", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updatePsychologist_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createCourse(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createCourse(ctx, field)
 	if err != nil {
@@ -1142,9 +1311,9 @@ func (ec *executionContext) _Mutation_createCourse(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Course)
+	res := resTmp.(*bunmodels.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createCourse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1185,6 +1354,75 @@ func (ec *executionContext) fieldContext_Mutation_createCourse(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateCourse(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateCourse(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateCourse(rctx, fc.Args["input"].(model.UpdateCourse))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*bunmodels.Course)
+	fc.Result = res
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCourse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Course_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Course_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Course_description(ctx, field)
+			case "price":
+				return ec.fieldContext_Course_price(ctx, field)
+			case "psychologists":
+				return ec.fieldContext_Course_psychologists(ctx, field)
+			case "lessons":
+				return ec.fieldContext_Course_lessons(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Course", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCourse_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createLesson(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createLesson(ctx, field)
 	if err != nil {
@@ -1211,9 +1449,9 @@ func (ec *executionContext) _Mutation_createLesson(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Lesson)
+	res := resTmp.(*bunmodels.Lesson)
 	fc.Result = res
-	return ec.marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLesson(ctx, field.Selections, res)
+	return ec.marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLesson(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createLesson(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1250,7 +1488,72 @@ func (ec *executionContext) fieldContext_Mutation_createLesson(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Psychologist_id(ctx context.Context, field graphql.CollectedField, obj *model.Psychologist) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_updateLesson(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateLesson(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateLesson(rctx, fc.Args["input"].(model.UpdateLesson))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*bunmodels.Lesson)
+	fc.Result = res
+	return ec.marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLesson(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateLesson(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Lesson_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Lesson_name(ctx, field)
+			case "number":
+				return ec.fieldContext_Lesson_number(ctx, field)
+			case "course":
+				return ec.fieldContext_Lesson_course(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Lesson", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateLesson_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Psychologist_id(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Psychologist) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Psychologist_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1294,7 +1597,7 @@ func (ec *executionContext) fieldContext_Psychologist_id(_ context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Psychologist_name(ctx context.Context, field graphql.CollectedField, obj *model.Psychologist) (ret graphql.Marshaler) {
+func (ec *executionContext) _Psychologist_name(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Psychologist) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Psychologist_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1338,7 +1641,7 @@ func (ec *executionContext) fieldContext_Psychologist_name(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Psychologist_description(ctx context.Context, field graphql.CollectedField, obj *model.Psychologist) (ret graphql.Marshaler) {
+func (ec *executionContext) _Psychologist_description(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Psychologist) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Psychologist_description(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1379,7 +1682,7 @@ func (ec *executionContext) fieldContext_Psychologist_description(_ context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Psychologist_courses(ctx context.Context, field graphql.CollectedField, obj *model.Psychologist) (ret graphql.Marshaler) {
+func (ec *executionContext) _Psychologist_courses(ctx context.Context, field graphql.CollectedField, obj *bunmodels.Psychologist) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Psychologist_courses(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1393,7 +1696,7 @@ func (ec *executionContext) _Psychologist_courses(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Courses, nil
+		return ec.resolvers.Psychologist().Courses(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1402,17 +1705,17 @@ func (ec *executionContext) _Psychologist_courses(ctx context.Context, field gra
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Course)
+	res := resTmp.([]*bunmodels.Course)
 	fc.Result = res
-	return ec.marshalOCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
+	return ec.marshalOCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Psychologist_courses(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Psychologist",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
@@ -1460,9 +1763,9 @@ func (ec *executionContext) _Query_psychologist(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Psychologist)
+	res := resTmp.(*bunmodels.Psychologist)
 	fc.Result = res
-	return ec.marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologist(ctx, field.Selections, res)
+	return ec.marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologist(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_psychologist(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1525,9 +1828,9 @@ func (ec *executionContext) _Query_psychologists(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Psychologist)
+	res := resTmp.([]*bunmodels.Psychologist)
 	fc.Result = res
-	return ec.marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologistᚄ(ctx, field.Selections, res)
+	return ec.marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologistᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_psychologists(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1579,9 +1882,9 @@ func (ec *executionContext) _Query_course(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Course)
+	res := resTmp.(*bunmodels.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_course(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1648,9 +1951,9 @@ func (ec *executionContext) _Query_courses(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Course)
+	res := resTmp.([]*bunmodels.Course)
 	fc.Result = res
-	return ec.marshalNCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourseᚄ(ctx, field.Selections, res)
+	return ec.marshalNCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_courses(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1706,9 +2009,9 @@ func (ec *executionContext) _Query_lesson(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Lesson)
+	res := resTmp.(*bunmodels.Lesson)
 	fc.Result = res
-	return ec.marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLesson(ctx, field.Selections, res)
+	return ec.marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLesson(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_lesson(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1771,9 +2074,9 @@ func (ec *executionContext) _Query_lessons(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Lesson)
+	res := resTmp.([]*bunmodels.Lesson)
 	fc.Result = res
-	return ec.marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLessonᚄ(ctx, field.Selections, res)
+	return ec.marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLessonᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_lessons(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3824,6 +4127,136 @@ func (ec *executionContext) unmarshalInputNewPsychologist(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateCourse(ctx context.Context, obj interface{}) (model.UpdateCourse, error) {
+	var it model.UpdateCourse
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name", "description", "price"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		case "price":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("price"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Price = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateLesson(ctx context.Context, obj interface{}) (model.UpdateLesson, error) {
+	var it model.UpdateLesson
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name", "number"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "number":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("number"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Number = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdatePsychologist(ctx context.Context, obj interface{}) (model.UpdatePsychologist, error) {
+	var it model.UpdatePsychologist
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "name", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "description":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Description = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -3834,7 +4267,7 @@ func (ec *executionContext) unmarshalInputNewPsychologist(ctx context.Context, o
 
 var courseImplementors = []string{"Course"}
 
-func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, obj *model.Course) graphql.Marshaler {
+func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, obj *bunmodels.Course) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, courseImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3846,30 +4279,92 @@ func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, o
 		case "id":
 			out.Values[i] = ec._Course_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Course_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "description":
 			out.Values[i] = ec._Course_description(ctx, field, obj)
 		case "price":
 			out.Values[i] = ec._Course_price(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "psychologists":
-			out.Values[i] = ec._Course_psychologists(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Course_psychologists(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "lessons":
-			out.Values[i] = ec._Course_lessons(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Course_lessons(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3895,7 +4390,7 @@ func (ec *executionContext) _Course(ctx context.Context, sel ast.SelectionSet, o
 
 var lessonImplementors = []string{"Lesson"}
 
-func (ec *executionContext) _Lesson(ctx context.Context, sel ast.SelectionSet, obj *model.Lesson) graphql.Marshaler {
+func (ec *executionContext) _Lesson(ctx context.Context, sel ast.SelectionSet, obj *bunmodels.Lesson) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, lessonImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3907,23 +4402,54 @@ func (ec *executionContext) _Lesson(ctx context.Context, sel ast.SelectionSet, o
 		case "id":
 			out.Values[i] = ec._Lesson_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Lesson_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "number":
 			out.Values[i] = ec._Lesson_number(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "course":
-			out.Values[i] = ec._Lesson_course(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Lesson_course(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3973,6 +4499,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updatePsychologist":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updatePsychologist(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createCourse":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createCourse(ctx, field)
@@ -3980,9 +4513,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "updateCourse":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCourse(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createLesson":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createLesson(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateLesson":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateLesson(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -4012,7 +4559,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 var psychologistImplementors = []string{"Psychologist"}
 
-func (ec *executionContext) _Psychologist(ctx context.Context, sel ast.SelectionSet, obj *model.Psychologist) graphql.Marshaler {
+func (ec *executionContext) _Psychologist(ctx context.Context, sel ast.SelectionSet, obj *bunmodels.Psychologist) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, psychologistImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -4024,17 +4571,48 @@ func (ec *executionContext) _Psychologist(ctx context.Context, sel ast.Selection
 		case "id":
 			out.Values[i] = ec._Psychologist_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Psychologist_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "description":
 			out.Values[i] = ec._Psychologist_description(ctx, field, obj)
 		case "courses":
-			out.Values[i] = ec._Psychologist_courses(ctx, field, obj)
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Psychologist_courses(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4581,11 +5159,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCourse2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalNCourse2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx context.Context, sel ast.SelectionSet, v bunmodels.Course) graphql.Marshaler {
 	return ec._Course(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourseᚄ(ctx context.Context, sel ast.SelectionSet, v []*bunmodels.Course) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4609,7 +5187,7 @@ func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkoval
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx, sel, v[i])
+			ret[i] = ec.marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4629,7 +5207,7 @@ func (ec *executionContext) marshalNCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkoval
 	return ret
 }
 
-func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v *model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalNCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx context.Context, sel ast.SelectionSet, v *bunmodels.Course) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4701,11 +5279,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNLesson2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLesson(ctx context.Context, sel ast.SelectionSet, v model.Lesson) graphql.Marshaler {
+func (ec *executionContext) marshalNLesson2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLesson(ctx context.Context, sel ast.SelectionSet, v bunmodels.Lesson) graphql.Marshaler {
 	return ec._Lesson(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLessonᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Lesson) graphql.Marshaler {
+func (ec *executionContext) marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLessonᚄ(ctx context.Context, sel ast.SelectionSet, v []*bunmodels.Lesson) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4729,7 +5307,7 @@ func (ec *executionContext) marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkoval
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLesson(ctx, sel, v[i])
+			ret[i] = ec.marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLesson(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4749,7 +5327,7 @@ func (ec *executionContext) marshalNLesson2ᚕᚖgithubᚗcomᚋyaroslavᚑkoval
 	return ret
 }
 
-func (ec *executionContext) marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐLesson(ctx context.Context, sel ast.SelectionSet, v *model.Lesson) graphql.Marshaler {
+func (ec *executionContext) marshalNLesson2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐLesson(ctx context.Context, sel ast.SelectionSet, v *bunmodels.Lesson) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4774,11 +5352,11 @@ func (ec *executionContext) unmarshalNNewPsychologist2githubᚗcomᚋyaroslavᚑ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPsychologist2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologist(ctx context.Context, sel ast.SelectionSet, v model.Psychologist) graphql.Marshaler {
+func (ec *executionContext) marshalNPsychologist2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologist(ctx context.Context, sel ast.SelectionSet, v bunmodels.Psychologist) graphql.Marshaler {
 	return ec._Psychologist(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologistᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Psychologist) graphql.Marshaler {
+func (ec *executionContext) marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologistᚄ(ctx context.Context, sel ast.SelectionSet, v []*bunmodels.Psychologist) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4802,7 +5380,7 @@ func (ec *executionContext) marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslav�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologist(ctx, sel, v[i])
+			ret[i] = ec.marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologist(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4822,7 +5400,7 @@ func (ec *executionContext) marshalNPsychologist2ᚕᚖgithubᚗcomᚋyaroslav�
 	return ret
 }
 
-func (ec *executionContext) marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐPsychologist(ctx context.Context, sel ast.SelectionSet, v *model.Psychologist) graphql.Marshaler {
+func (ec *executionContext) marshalNPsychologist2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐPsychologist(ctx context.Context, sel ast.SelectionSet, v *bunmodels.Psychologist) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4845,6 +5423,21 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateCourse2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐUpdateCourse(ctx context.Context, v interface{}) (model.UpdateCourse, error) {
+	res, err := ec.unmarshalInputUpdateCourse(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateLesson2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐUpdateLesson(ctx context.Context, v interface{}) (model.UpdateLesson, error) {
+	res, err := ec.unmarshalInputUpdateLesson(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdatePsychologist2githubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐUpdatePsychologist(ctx context.Context, v interface{}) (model.UpdatePsychologist, error) {
+	res, err := ec.unmarshalInputUpdatePsychologist(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -5126,7 +5719,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v []*model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalOCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx context.Context, sel ast.SelectionSet, v []*bunmodels.Course) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -5153,7 +5746,7 @@ func (ec *executionContext) marshalOCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkoval
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx, sel, v[i])
+			ret[i] = ec.marshalOCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5167,11 +5760,49 @@ func (ec *executionContext) marshalOCourse2ᚕᚖgithubᚗcomᚋyaroslavᚑkoval
 	return ret
 }
 
-func (ec *executionContext) marshalOCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋgraphᚋmodelᚐCourse(ctx context.Context, sel ast.SelectionSet, v *model.Course) graphql.Marshaler {
+func (ec *executionContext) marshalOCourse2ᚖgithubᚗcomᚋyaroslavᚑkovalᚋgraphqlᚑpsychologistsᚑcoursesᚋbunmodelsᚐCourse(ctx context.Context, sel ast.SelectionSet, v *bunmodels.Course) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Course(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

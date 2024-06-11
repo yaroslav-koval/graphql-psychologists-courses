@@ -6,61 +6,87 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/yaroslav-koval/graphql-psychologists-courses/bunmodels"
 	"github.com/yaroslav-koval/graphql-psychologists-courses/graph/model"
 )
 
-// CreatePsychologist is the resolver for the createPsychologist field.
-func (r *mutationResolver) CreatePsychologist(ctx context.Context, input model.NewPsychologist) (*model.Psychologist, error) {
-	panic(fmt.Errorf("not implemented: CreatePsychologist - createPsychologist"))
+func (r *courseResolver) Psychologists(ctx context.Context, obj *bunmodels.Course) ([]*bunmodels.Psychologist, error) {
+	return r.em.GetCoursePsychologists(ctx, obj.ID)
 }
 
-// CreateCourse is the resolver for the createCourse field.
-func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCourse) (*model.Course, error) {
-	panic(fmt.Errorf("not implemented: CreateCourse - createCourse"))
+func (r *courseResolver) Lessons(ctx context.Context, obj *bunmodels.Course) ([]*bunmodels.Lesson, error) {
+	return r.em.GetCourseLessons(ctx, obj.ID)
 }
 
-// CreateLesson is the resolver for the createLesson field.
-func (r *mutationResolver) CreateLesson(ctx context.Context, input model.NewLesson) (*model.Lesson, error) {
-	panic(fmt.Errorf("not implemented: CreateLesson - createLesson"))
+func (r *lessonResolver) Course(ctx context.Context, obj *bunmodels.Lesson) (*bunmodels.Course, error) {
+	return r.em.GetCourseByID(ctx, obj.CourseID)
 }
 
-// Psychologist is the resolver for the psychologist field.
-func (r *queryResolver) Psychologist(ctx context.Context, id string) (*model.Psychologist, error) {
+func (r *mutationResolver) CreatePsychologist(ctx context.Context, input model.NewPsychologist) (*bunmodels.Psychologist, error) {
+	return r.em.CreatePsychologist(ctx, input)
+}
+
+func (r *mutationResolver) UpdatePsychologist(ctx context.Context, input model.UpdatePsychologist) (*bunmodels.Psychologist, error) {
+	return r.em.UpdatePsychologist(ctx, input)
+}
+
+func (r *mutationResolver) CreateCourse(ctx context.Context, input model.NewCourse) (*bunmodels.Course, error) {
+	return r.em.CreateCourse(ctx, input)
+}
+
+func (r *mutationResolver) UpdateCourse(ctx context.Context, input model.UpdateCourse) (*bunmodels.Course, error) {
+	return r.em.UpdateCourse(ctx, input)
+}
+
+func (r *mutationResolver) CreateLesson(ctx context.Context, input model.NewLesson) (*bunmodels.Lesson, error) {
+	return r.em.CreateLesson(ctx, input)
+}
+
+func (r *mutationResolver) UpdateLesson(ctx context.Context, input model.UpdateLesson) (*bunmodels.Lesson, error) {
+	return r.em.UpdateLesson(ctx, input)
+}
+
+func (r *psychologistResolver) Courses(ctx context.Context, obj *bunmodels.Psychologist) ([]*bunmodels.Course, error) {
+	return r.em.GetPsychologistCourses(ctx, obj.ID)
+}
+
+func (r *queryResolver) Psychologist(ctx context.Context, id string) (*bunmodels.Psychologist, error) {
 	return r.em.GetPsychologistByID(ctx, id)
 }
 
-// Psychologists is the resolver for the psychologists field.
-func (r *queryResolver) Psychologists(ctx context.Context) ([]*model.Psychologist, error) {
+func (r *queryResolver) Psychologists(ctx context.Context) ([]*bunmodels.Psychologist, error) {
 	return r.em.GetAllPsychologists(ctx)
 }
 
-// Course is the resolver for the course field.
-func (r *queryResolver) Course(ctx context.Context, id string) (*model.Course, error) {
+func (r *queryResolver) Course(ctx context.Context, id string) (*bunmodels.Course, error) {
 	return r.em.GetCourseByID(ctx, id)
 }
 
-// Courses is the resolver for the courses field.
-func (r *queryResolver) Courses(ctx context.Context) ([]*model.Course, error) {
+func (r *queryResolver) Courses(ctx context.Context) ([]*bunmodels.Course, error) {
 	return r.em.GetAllCourses(ctx)
 }
 
-// Lesson is the resolver for the lesson field.
-func (r *queryResolver) Lesson(ctx context.Context, id string) (*model.Lesson, error) {
+func (r *queryResolver) Lesson(ctx context.Context, id string) (*bunmodels.Lesson, error) {
 	return r.em.GetLessonByID(ctx, id)
 }
 
-// Lessons is the resolver for the lessons field.
-func (r *queryResolver) Lessons(ctx context.Context) ([]*model.Lesson, error) {
+func (r *queryResolver) Lessons(ctx context.Context) ([]*bunmodels.Lesson, error) {
 	return r.em.GetAllLessons(ctx)
 }
 
-// Mutation returns MutationResolver implementation.
+func (r *Resolver) Course() CourseResolver { return &courseResolver{r} }
+
+func (r *Resolver) Lesson() LessonResolver { return &lessonResolver{r} }
+
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
-// Query returns QueryResolver implementation.
+func (r *Resolver) Psychologist() PsychologistResolver { return &psychologistResolver{r} }
+
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type courseResolver struct{ *Resolver }
+type lessonResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
+type psychologistResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
