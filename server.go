@@ -32,11 +32,14 @@ func main() {
 	connString := os.Getenv("GRAPHQL_SERVER_CONNECTION_STRING")
 	if connString == "" {
 		connString = db.ParsePGConnString(
-			"postgres",
-			"secret",
-			"localhost",
-			5432,
-			"graphql-psychologists-courses",
+			&db.PostgresConnectionConfig{
+				Username: "postgres",
+				Password: "secret",
+				Host:     "localhost",
+				Port:     5432,
+				DBName:   "graphql-psychologists-courses",
+				SSLMode:  db.SslModeDisable,
+			},
 		)
 	}
 

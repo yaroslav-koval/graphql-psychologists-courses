@@ -54,20 +54,22 @@ func (em *EntityManager) CreateCourse(ctx context.Context, input model.NewCourse
 		return nil, err
 	}
 
-	relations := []*bunmodels.CoursePsychologist{}
-	for _, pid := range input.Psychologists {
-		relations = append(relations, &bunmodels.CoursePsychologist{
-			CourseID:       c.ID,
-			PsychologistID: pid,
-		})
-	}
+	if len(input.Psychologists) != 0 {
+		relations := []*bunmodels.CoursePsychologist{}
+		for _, pid := range input.Psychologists {
+			relations = append(relations, &bunmodels.CoursePsychologist{
+				CourseID:       c.ID,
+				PsychologistID: pid,
+			})
+		}
 
-	_, err = tx.NewInsert().
-		Model(&relations).
-		Exec(ctx)
-	if err != nil {
-		logging.SendSimpleErrorAsync(err)
-		return nil, err
+		_, err = tx.NewInsert().
+			Model(&relations).
+			Exec(ctx)
+		if err != nil {
+			logging.SendSimpleErrorAsync(err)
+			return nil, err
+		}
 	}
 
 	err = tx.Commit()

@@ -6,19 +6,18 @@ import (
 	"github.com/rs/zerolog"
 )
 
-var logger zerolog.Logger = getDefaultLoggerContext(zerolog.New(os.Stdout))
-
-func Logger() zerolog.Logger {
-	return logger
-}
+var logger zerolog.Logger = zerolog.New(nil)
 
 func SetLogger(l zerolog.Logger) {
-	logger = getDefaultLoggerContext(l)
+	logger = applyDefaultLoggerContext(l)
 }
 
-func getDefaultLoggerContext(l zerolog.Logger) zerolog.Logger {
-	resL := l.With().Timestamp().Logger()
-	return resL
+func SetDefaultLogger() {
+	logger = applyDefaultLoggerContext(zerolog.New(os.Stdout))
+}
+
+func applyDefaultLoggerContext(l zerolog.Logger) zerolog.Logger {
+	return l.With().Timestamp().Logger()
 }
 
 func Trace() *zerolog.Event {
@@ -41,14 +40,6 @@ func Error() *zerolog.Event {
 	return logger.Error()
 }
 
-func Fatal() *zerolog.Event {
-	return logger.Fatal()
-}
-
 func Panic() *zerolog.Event {
 	return logger.Panic()
-}
-
-func WithLevel(lvl zerolog.Level) *zerolog.Event {
-	return logger.WithLevel(lvl)
 }

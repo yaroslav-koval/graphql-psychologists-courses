@@ -17,7 +17,6 @@ type logQueue struct {
 }
 
 var q = logQueue{
-	m:      sync.Mutex{},
 	events: []*zerolog.Event{},
 }
 
@@ -63,16 +62,14 @@ func (q *logQueue) fetch() *zerolog.Event {
 func SendAsync(e *zerolog.Event, skipOptional ...int) {
 	e = e.Array("stack", getStack(skipOptional...))
 
-	logger.GetLevel()
-
 	q.add(e)
 	q.wg.Add(1)
 	go func() {
 		defer q.wg.Done()
 
-		le := q.fetch()
-		if le != nil {
-			le.Send()
+		qe := q.fetch()
+		if qe != nil {
+			qe.Send()
 		}
 	}()
 }
@@ -90,7 +87,7 @@ func SendSimpleError(err error, skipOptional ...int) {
 	}
 
 	Send(
-		Error().Str("message", err.Error()),
+		Error().Err(err),
 		skip,
 	)
 }

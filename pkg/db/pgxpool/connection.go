@@ -9,25 +9,35 @@ import (
 	"github.com/yaroslav-koval/graphql-psychologists-courses/pkg/logging"
 )
 
-func CreatePool(ctx context.Context, connString string) (*pgxpool.Pool, error) {
+type PoolConfig struct {
+	PingTimeout           time.Duration
+	PingAttempts          int
+	MinConnections        int32
+	MaxConnections        int32
+	MaxConnectionLifetime time.Duration
+	MaxConnectionIdleTime time.Duration
+	HealthCheckPeriod     time.Duration
+}
+
+func CreatePool(ctx context.Context, connString string, cfg *PoolConfig) (*pgxpool.Pool, error) {
 	dbConfig, err := pgxpool.ParseConfig(connString)
 	if err != nil {
 		return nil, err
 	}
 
-	dbConfig.MinConns = 5
-	dbConfig.MaxConns = 20
-	dbConfig.MaxConnLifetime = 30 * time.Minute
-	dbConfig.MaxConnIdleTime = 5 * time.Minute
-	dbConfig.HealthCheckPeriod = time.Minute
+	dbConfig.MinConns = cfg.MinConnections
+	dbConfig.MaxConns = cfg.MaxConnections
+	dbConfig.MaxConnLifetime = cfg.MaxConnectionLifetime
+	dbConfig.MaxConnIdleTime = cfg.MaxConnectionIdleTime
+	dbConfig.HealthCheckPeriod = cfg.HealthCheckPeriod
 
 	pool, err := pgxpool.NewWithConfig(ctx, dbConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	timeout := 5
-	attempts := 10
+	timeout := cfg.PingTimeout
+	attempts := cfg.PingAttempts
 	for i := 1; i <= attempts; i++ {
 		logging.Send(
 			logging.Info().Caller().Str("message", fmt.Sprintf(`Connection to postgres, attempt #%v`, i)),
@@ -50,7 +60,7 @@ func CreatePool(ctx context.Context, connString string) (*pgxpool.Pool, error) {
 			return nil, err
 		}
 
-		time.Sleep(time.Duration(timeout) * time.Second)
+		time.Sleep(timeout)
 	}
 
 	logging.Send(
